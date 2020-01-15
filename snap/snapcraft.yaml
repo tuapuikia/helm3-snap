@@ -10,11 +10,9 @@ grade: stable
 confinement: strict
 
 apps:
-  helm:
-    command: helm
-    plugs:
-    - network
-    - network-bind
+  helm3:
+    command: helm3
+    plugs: [home, network, network-bind]
 
 architectures:
   - build-on: amd64
@@ -23,12 +21,12 @@ architectures:
   - build-on: arm64
 
 parts:
-  helm:
+  helm3:
     plugin: dump
-    source:
-      - on amd64: https://get.helm.sh/helm-v$SNAPCRAFT_PROJECT_VERSION-linux-amd64.tar.gz
-      - on i386: https://get.helm.sh/helm-v$SNAPCRAFT_PROJECT_VERSION-linux-386.tar.gz
-      - on armhf: https://get.helm.sh/helm-v$SNAPCRAFT_PROJECT_VERSION-linux-arm.tar.gz
-      - on arm64: https://get.helm.sh/helm-v$SNAPCRAFT_PROJECT_VERSION-linux-arm64.tar.gz
-    stage:
-      - helm
+    source: .
+    override-build: |
+      apt install curl tar -y
+      curl -Lo helm.tar.gz https://get.helm.sh/helm-v$SNAPCRAFT_PROJECT_VERSION-linux-amd64.tar.gz
+      tar xzf helm.tar.gz
+      mkdir -p /build/parts/helm3/install/bin
+      mv linux-amd64/helm /build/parts/helm3/install/bin/helm3
